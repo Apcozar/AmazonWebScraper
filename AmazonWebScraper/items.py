@@ -8,12 +8,20 @@
 import scrapy
 
 
-class AmazonwebscraperItem(scrapy.Item):
+class AmazonPhoneItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    product_name = scrapy.Field()
-    product_rating = scrapy.Field()
-    product_price = scrapy.Field()
-    product_views = scrapy.Field()
-    product_imageLink = scrapy.Field()
+    brand = scrapy.Field()
+    model_name = scrapy.Field()
+    rating = scrapy.Field()
+    price = scrapy.Field()
+    views = scrapy.Field()
+    image = scrapy.Field()
+    os = scrapy.Field()
+    cellular_technology = scrapy.Field()
+    memory_storage = scrapy.Field()
+    connectivity = scrapy.Field()
+    color = scrapy.Field()
+    screen_size = scrapy.Field()
+    link = scrapy.Field()
     pass
