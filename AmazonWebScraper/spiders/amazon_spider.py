@@ -4,12 +4,12 @@ from ..items import AmazonwebscraperItem
 
 class AmazonSpiderSpider(scrapy.Spider):
     name = 'amazon'
-    page_number = 2
+    page_number = 0
+    max_pages = 1
     start_urls = [
             'https://www.amazon.es/s?bbn=599370031&rh=n%3A17425698031&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433&pd_rd_w=tsGEf&pd_rd_wg=GvZaY&rd=1&ref=Oct_d_odnav_599370031']
-
     def parse(self, response):
-        AmazonSpiderSpider.page_number += 1;
+        AmazonSpiderSpider.page_number += 1
         items = AmazonwebscraperItem()
 
         all_page_products = response.css('.s-widget-spacing-small .sg-col-inner')
@@ -31,5 +31,5 @@ class AmazonSpiderSpider(scrapy.Spider):
 
         next_page = 'https://www.amazon.es/s?i=electronics&bbn=599370031&rh=n%3A17425698031&page='+str(AmazonSpiderSpider.page_number)+'&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433&pd_rd_w=tsGEf&pd_rd_wg=GvZaY&qid=1637710604&rd=1&ref=sr_pg_'+str(AmazonSpiderSpider.page_number)
 
-        if AmazonSpiderSpider.page_number <= 5:
+        if AmazonSpiderSpider.page_number < AmazonSpiderSpider.max_pages:
             yield response.follow(next_page, callback=self.parse)
