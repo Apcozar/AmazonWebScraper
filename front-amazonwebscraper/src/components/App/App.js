@@ -1,6 +1,6 @@
-import { LeftPanel } from "./components/LeftPanel.jsx/LeftPanel";
-import { Catalog } from "./components/Catalog/Catalog";
-import { CustomNavbar } from "./components/CustomNavbar/CustomNavbar";
+import { LeftPanel } from "../LeftPanel/LeftPanel";
+import { CustomNavbar } from "../CustomNavbar/CustomNavbar";
+import { Catalog } from "../Catalog/Catalog";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
