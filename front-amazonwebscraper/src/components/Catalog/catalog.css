@@ -1,9 +1,0 @@
-.catalog__main {
-	position: fixed;
-	top: var(--navbar-height);
-	bottom: 0;
-	right: 0;
-	overflow-y: scroll;
-	width: calc(100% - var(--leftPanel-width));
-	padding: 12px;
-}
