@@ -1,9 +1,0 @@
-.custom-navbar {
-	height: var(--navbar-height);
-	background-color: var(--color-custom-navbar);
-	width: 100%;
-}
-
-.customNavbar__title {
-	margin-left: 10px;
-}
