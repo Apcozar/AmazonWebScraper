@@ -36,11 +36,8 @@ class AmazonSpider(scrapy.Spider):
             phones['image'] = product_imagelink
 
             phone_page = AmazonSpider.base_url + str(product.css('.s-line-clamp-4 a::attr(href)').get())
-            request = Request(url=phone_page, callback=self.parse_page2, meta={'phones': phones})
+            yield Request(url=phone_page, callback=self.parse_page2, meta={'phones': phones})
 
-            phones['brand'] = request
-
-            return phones
 
         next_page = 'https://www.amazon.es/s?i=electronics&bbn=599370031&rh=n%3A17425698031&page=' + str(
             AmazonSpider.page_number) + '&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433&pd_rd_w=tsGEf' \
@@ -51,11 +48,13 @@ class AmazonSpider(scrapy.Spider):
             yield Request(next_page, callback=self.parse, dont_filter=True)
 
     def parse_page2(self, response):
-        phone = response.meta['phones']
+
+        phones = response.meta['phones']
         phone_product = response.css('a-normal a-spacing-micro')
 
         brand = phone_product.css('.po-brand .a-span9 .a-size-base').css('::text').get()
 
-        phone['brand'] = brand
+        phones['brand'] = 'cheese'
 
-        yield phone
+        yield phones
+
