@@ -24,4 +24,5 @@ class AmazonPhoneItem(scrapy.Item):
     color = scrapy.Field()
     screen_size = scrapy.Field()
     description = scrapy.Field()
+    wireless_net_tech = scrapy.Field()
     pass
