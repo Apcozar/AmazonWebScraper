@@ -73,9 +73,9 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'AmazonWebScraper.pipelines.AmazonwebscraperPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'AmazonWebScraper.pipelines.AmazonwebscraperPipeline': 300,
+}
 
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -98,3 +98,7 @@ DOWNLOADER_MIDDLEWARES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+ELASTICSEARCH_USER = 'elastic'
+ELASTICSEARCH_PASSWORD = 'mueiriws22'
+ELASTICSEARCH_URL = "https://localhost:9200/"
