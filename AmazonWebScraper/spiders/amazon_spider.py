@@ -43,10 +43,10 @@ class AmazonSpider(scrapy.Spider):
         memory_storage = response.css('.po-memory_storage_capacity .a-span9 .a-size-base').css('::text').get()
         connectivity = response.css('.po-connectivity_technology .a-span9 .a-size-base').css('::text').get()
         color = response.css('.po-color .a-span9 .a-size-base').css('::text').get()
-        screen_size = response.css('.po-display.size .a-span9 .a-size-base').css('::text').get()
+        screen_size = response.css('.po-display\.size .a-span9 .a-size-base').css('::text').get()
         wireless_net_tech = response.css('.po-wireless_network_technology .a-span9 .a-size-base').css('::text').get()
         rating = response.css('.a-icon-alt').css('::text').get()
-        image = response.css('.a-declarative .a-dynamic-image .a-stretch-vertical img::attr(src)').get()
+        image = response.css('#imgTagWrapperId img::attr(src)').get()
         price = response.css('.a-offscreen').css('::text').get()
         views = response.css('.a-declarative .a-link-normal .a-size-base').css('::text').get()
 
