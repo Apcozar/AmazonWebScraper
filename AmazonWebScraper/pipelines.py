@@ -8,9 +8,6 @@
 from elasticsearch import Elasticsearch
 from AmazonWebScraper.settings import ELASTICSEARCH_PASSWORD, ELASTICSEARCH_USER, ELASTICSEARCH_URL
 
-# Single node via URL
-
-
 class AmazonwebscraperPipeline(object):
 
     def open_spider(self, spider):
