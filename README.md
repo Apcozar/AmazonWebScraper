@@ -194,3 +194,7 @@ Entrar en el navegador a `http://localhost:5601/` y meter credenciales.
 
 - login: **elastic**
 - password: **$ELASTIC_PASSWORD que se escribio en el fichero .env (en este caso mueiriws22)**
+
+### 3. HTTP Request al servicio para geestionar indices
+
+Utilizar autenticacion basic con login **elastic** y password: **$ELASTIC_PASSWORD** a la url: `https://localhost:9200`
