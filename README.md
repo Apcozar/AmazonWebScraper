@@ -12,10 +12,17 @@ Si el venv se genera solo, como pasa el PyCharm, solo hacer el paso 2 una vez se
 ## Elasticsearch
 
 [Link documentacion](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+### 1. Configurar memoria docker
 
-### 1. Crear fichero docker-compose
+Configuramos la memoria de docker para que podamos ejecutar el compose 
+```bash
+wsl -d docker-desktop
+sysctl -w vm.max_map_count=262144
+```
+### 2. Crear fichero docker-compose
 
 Crear fichero .env
+
 
 ```bash
 #.env
@@ -186,7 +193,7 @@ volumes:
     driver: local
 ```
 
-### 2. Ejecutar servicio
+### 3. Ejecutar servicio
 
 Ejecutar `docker-compose up -d` en el directorio donde se crearon los fichero **.env** y **docker-compose**.
 
