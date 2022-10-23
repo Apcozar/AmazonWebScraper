@@ -80,7 +80,7 @@ class AmazonwebscraperPipeline(object):
                 es.indices.delete(index='riws_amazon_scraper', ignore=[400, 404])
             # Create index in Elasticsearch
             try:
-                mapping = {
+                settings = {
                     "mappings": {
                         "properties": {
                             "brand": {
@@ -95,8 +95,8 @@ class AmazonwebscraperPipeline(object):
                             "price": {
                                 "type": "double",
                             },
-                            "views": {
-                                "type": "text",
+                            "number_ratings": {
+                                "type": "integer",
                             },
                             "image": {
                                 "type": "text",
@@ -126,12 +126,15 @@ class AmazonwebscraperPipeline(object):
                             # },
                             "wireless_net_tech": {
                                 "type": "text",
+                            },
+                            "full": {
+                                "type": "text",
                             }
                         }
                     }
                 }
 
-                es.indices.create(index='riws_amazon_scraper', body=mapping)
+                es.indices.create(index='riws_amazon_scraper', body=settings)
                 print("Index successfully created!")
             except Exception as index_err:
                 print("Couldn't create index in Elasticsearch. Error " + str(index_err))
@@ -150,7 +153,7 @@ class AmazonwebscraperPipeline(object):
                 "model_name": str(item['model_name']),
                 "rating": parse_rating(str(item['rating'])),
                 "price": parse_price(str(item['price'])),
-                "views": parse_views(str(item['views'])),
+                "number_ratings": parse_views(str(item['views'])),
                 "image": str(item['image']),
                 "os": str(item['os']),
                 "cellular_technology": str(item['cellular_technology']),
@@ -159,6 +162,11 @@ class AmazonwebscraperPipeline(object):
                 "color": str(item['color']),
                 "screen_size": parse_screen_size(str(item['screen_size'])),
                 "wireless_net_tech": str(item['wireless_net_tech']),
+                "full": str(item['brand']) + " " + str(item['model_name']) + " " + str(item['rating']) + " " + str(
+                    item['price']) + " " + str(
+                    item['views']) + " " + str(item['os']) + " " + str(item['cellular_technology']) + " " + str(
+                    item['memory_storage']) + " " + str(item['connectivity']) + " " + str(item['color']) + " " + str(
+                    item['screen_size']) + " " + str(item['wireless_net_tech'])
             }
 
             es.index(index="riws_amazon_scraper", document=doc)
