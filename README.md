@@ -7,22 +7,55 @@ Amazon Web Scraper for "Recuperación da Información e Web Semántica"
 1. Generar venv: `python3 -h venv`
 2. Ejecutar el spider: `scrapy crawl amazon`
 
-Si el venv se genera solo, como pasa el PyCharm, solo hacer el paso 2 una vez se configure correctamente el interpreter y se descarguen las dependencias del proyecto.
+Si el venv se genera solo, como pasa el PyCharm, solo hacer el paso 2 una vez se configure correctamente el interpreter
+y se descarguen las dependencias del proyecto.
+
+Item parser in function **process_item()** in file **pipelines.py**
+
+```py
+# Example item:
+# {'brand': 'Saiet', 'cellular_technology': '4G', 'color': 'Blanco perla (ral 1013)', 'connectivity': 'Bluetooth, Wi-Fi',
+#  'image': 'https://m.media-amazon.com/images/I/71EhDktbSRL.__AC_SX300_SY300_QL70_ML2_.jpg', 'memory_storage': '8 GB',
+#  'model_name': None, 'os': 'Android 10.0', 'price': '119,90€', 'rating': '3,5 de 5 estrellas',
+#  'screen_size': '5 Pulgadas', 'views': '46 valoraciones', 'wireless_net_tech': 'Wi-Fi'}
+
+# more imports
+import re  # regexp package
+import locale  # set locale for parsing currency values
+
+locale.setlocale(locale.LC_NUMERIC, "es_ES")
+
+
+def process_item(self, item, spider):
+    # rest of code
+    doc = {
+        # ...
+        "price": locale.atof(re.sub("[$|€]", "", str(item['price']))),
+        "rating": locale.atof(str(item['rating']).split(' de 5 estrellas')[0]),
+        "screen_size": float(str(item['screen_size']).split(' Pulgadas')[0]),
+        "views": int(str(item['views']).split(' valoraciones')[0]),
+        # ...
+    }
+
+    es.index(index="riws_amazon_scraper", document=doc)
+```
 
 ## Elasticsearch
 
 [Link documentacion](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+
 ### 1. Configurar memoria docker
 
-Configuramos la memoria de docker para que podamos ejecutar el compose 
+Configuramos la memoria de docker para que podamos ejecutar el compose
+
 ```bash
 wsl -d docker-desktop
 sysctl -w vm.max_map_count=262144
 ```
+
 ### 2. Crear fichero docker-compose
 
 Crear fichero .env
-
 
 ```bash
 #.env
@@ -110,7 +143,7 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -192,6 +225,10 @@ volumes:
   kibanadata:
     driver: local
 ```
+
+keywords para campos para hacer facetas, si es texto hacer subtipo tipo keyword
+
+Usar keyword para brand, cellular_technology, memory_storage, os
 
 ### 3. Ejecutar servicio
 

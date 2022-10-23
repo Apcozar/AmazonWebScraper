@@ -9,7 +9,7 @@ class AmazonSpider(scrapy.Spider):
     name = 'amazon'
     base_url = 'https://www.amazon.es'
     page_number = 0
-    max_pages = 1
+    max_pages = 30
     start_urls = [
         'https://www.amazon.es/s?bbn=599370031&rh=n%3A17425698031&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433'
         '&pd_rd_w=tsGEf&pd_rd_wg=GvZaY&rd=1&ref=Oct_d_odnav_599370031']
@@ -20,7 +20,6 @@ class AmazonSpider(scrapy.Spider):
         products = response.css('.s-widget-spacing-small .sg-col-inner')
 
         for product in products:
-
             product_link = AmazonSpider.base_url + str(product.css('.s-line-clamp-4 a::attr(href)').get())
             yield response.follow(product_link, callback=self.parse_products)
 
@@ -65,5 +64,3 @@ class AmazonSpider(scrapy.Spider):
         phones['wireless_net_tech'] = wireless_net_tech
 
         yield phones
-
-

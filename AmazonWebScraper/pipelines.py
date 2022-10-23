@@ -5,54 +5,111 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 
+import locale
+import re
+
 from elasticsearch import Elasticsearch
+
 from AmazonWebScraper.settings import ELASTICSEARCH_PASSWORD, ELASTICSEARCH_USER, ELASTICSEARCH_URL
 
+
+def parse_memory_storage(memory_storage):
+    if not memory_storage:
+        return memory_storage
+    try:
+        return locale.atof(re.findall(r'\b\d+\b', str(memory_storage))[0])
+    except Exception as err:
+        print('Cannot convert [memory_storage] field. Value: {' + memory_storage + '}. Error ' + str(err))
+        return None
+
+
+def parse_price(price):
+    if not price:
+        return price
+    try:
+        print(price)
+        return locale.atof(re.sub("[$|€]", "", str(price)))
+    except Exception as err:
+        print('Cannot convert [price] field. Value: {' + price + '}. Error: ' + str(err))
+        return None
+
+
+def parse_rating(rating):
+    if not rating:
+        return rating
+    try:
+        return locale.atof(str(rating).split(' de 5 estrellas')[0])
+    except Exception as err:
+        print('Cannot convert [memory_storage] field. Value: {' + rating + '}. Error ' + str(err))
+        return None
+
+
+def parse_screen_size(screen_size):
+    if not screen_size:
+        return screen_size
+    try:
+        return float(str(screen_size).split(' Pulgadas')[0])
+    except Exception as err:
+        print('Cannot convert [memory_storage] field. Value: {' + screen_size + '}. Error ' + str(err))
+        return None
+
+
+def parse_views(views):
+    if not views:
+        return views
+    try:
+        return int(str(views).split(' valoraciones')[0])
+    except Exception as err:
+        print('Cannot convert [memory_storage] field. Value: {' + views + '}. Error ' + str(err))
+        return None
+
+
 class AmazonwebscraperPipeline(object):
+    locale.setlocale(locale.LC_NUMERIC, "es_ES")
 
     def open_spider(self, spider):
         try:
-            
+
             # Connection to Elasticsearch
             es = Elasticsearch(ELASTICSEARCH_URL, http_auth=(ELASTICSEARCH_USER, ELASTICSEARCH_PASSWORD),
-                                          verify_certs=False)
+                               verify_certs=False)
             print("Connection to Elasticsearch successfully established!. Info " + str(es.info()))
 
             if es.indices.exists(index="riws_amazon_scraper"):
-                print("Index already exists")               
-                es.indices.delete(index='riws_amazon_scraper', body=mapping)
+                print("Index already exists")
+                es.indices.delete(index='riws_amazon_scraper', ignore=[400, 404])
             # Create index in Elasticsearch
             try:
                 mapping = {
                     "mappings": {
                         "properties": {
                             "brand": {
-                                "type": "text",
+                                "type": "keyword",
                             },
                             "model_name": {
                                 "type": "text",
                             },
                             "rating": {
-                                "type": "text",
+                                "type": "double",
                             },
                             "price": {
-                                "type": "text",
+                                "type": "double",
                             },
                             "views": {
                                 "type": "text",
                             },
-                            # "image": {
-                            #     "type": "text",
-                            #     "index": "false"
-                            # },
-                            "os": {
+                            "image": {
                                 "type": "text",
+                                "index": "false"
+                            },
+                            "os": {
+                                "type": "keyword",
                             },
                             "cellular_technology": {
-                                "type": "text",
+                                "type": "keyword",
                             },
                             "memory_storage": {
-                                "type": "text",
+                                "type": "keyword",
                             },
                             "connectivity": {
                                 "type": "text",
@@ -61,7 +118,7 @@ class AmazonwebscraperPipeline(object):
                                 "type": "text",
                             },
                             "screen_size": {
-                                "type": "text",
+                                "type": "double",
                             },
                             # "description": {
                             #     "type": "text",
@@ -87,28 +144,25 @@ class AmazonwebscraperPipeline(object):
         # Añadir al indice riws amazon scraper cada item como documento   
         try:
             es = Elasticsearch(ELASTICSEARCH_URL, http_auth=(ELASTICSEARCH_USER, ELASTICSEARCH_PASSWORD),
-                                          verify_certs=False) 
-           
+                               verify_certs=False)
             doc = {
-                "brand" : str(item['brand']),
-                "model_name" : str(item['model_name']),
-                "rating" : str(item['rating']),
-                "price" : str(item['price']),
-                "views" : str(item['views']),
-                #"image" : item.Image,
-                "os" : str(item['os']),
-                "cellular_technology" : str(item['cellular_technology']),
-                "memory_storage" : str(item['memory_storage']),
-                "connectivity" : str(item['connectivity']),
-                "color" : str(item['color']),
-                "screen_size" : str(item['screen_size']),
-                #"description" : str(item['description']),
-                "wireless_net_tech" : str(item['wireless_net_tech']),
+                "brand": str(item['brand']),
+                "model_name": str(item['model_name']),
+                "rating": parse_rating(str(item['rating'])),
+                "price": parse_price(str(item['price'])),
+                "views": parse_views(str(item['views'])),
+                "image": str(item['image']),
+                "os": str(item['os']),
+                "cellular_technology": str(item['cellular_technology']),
+                "memory_storage": str(item['memory_storage']),
+                "connectivity": str(item['connectivity']),
+                "color": str(item['color']),
+                "screen_size": parse_screen_size(str(item['screen_size'])),
+                "wireless_net_tech": str(item['wireless_net_tech']),
             }
-            print("Previo insert")
 
-            resp = es.index(index="riws_amazon_scraper",document=doc)
+            es.index(index="riws_amazon_scraper", document=doc)
         except Exception as err:
-            print("Couldn't connect to Elasticsearch in insert. Error " + str(err))
+            print("Couldn't connect to Elasticsearch in indexing item " + str(item) + ". Error " + str(err))
 
         return item
