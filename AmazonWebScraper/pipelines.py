@@ -20,7 +20,7 @@ def parse_memory_storage(memory_storage):
         return locale.atof(re.findall(r'\b\d+\b', str(memory_storage))[0])
     except Exception as err:
         print('Cannot convert [memory_storage] field. Value: {' + memory_storage + '}. Error ' + str(err))
-        return None
+        return float(0)
 
 
 def parse_price(price):
@@ -31,17 +31,17 @@ def parse_price(price):
         return locale.atof(re.sub("[$|€]", "", str(price)))
     except Exception as err:
         print('Cannot convert [price] field. Value: {' + price + '}. Error: ' + str(err))
-        return None
+        return float(0)
 
 
 def parse_rating(rating):
     if not rating:
-        return rating
+        return 0
     try:
         return locale.atof(str(rating).split(' de 5 estrellas')[0])
     except Exception as err:
         print('Cannot convert [memory_storage] field. Value: {' + rating + '}. Error ' + str(err))
-        return None
+        return float(0)
 
 
 def parse_screen_size(screen_size):
@@ -51,17 +51,19 @@ def parse_screen_size(screen_size):
         return float(str(screen_size).split(' Pulgadas')[0])
     except Exception as err:
         print('Cannot convert [memory_storage] field. Value: {' + screen_size + '}. Error ' + str(err))
-        return None
+        return float(0)
 
 
 def parse_views(views):
     if not views:
-        return views
+        return 0
     try:
+        if ' valoraciones' not in views:
+            return 0
         return int(str(views).split(' valoraciones')[0])
     except Exception as err:
         print('Cannot convert [memory_storage] field. Value: {' + views + '}. Error ' + str(err))
-        return None
+        return 0
 
 
 class AmazonwebscraperPipeline(object):
@@ -81,6 +83,26 @@ class AmazonwebscraperPipeline(object):
             # Create index in Elasticsearch
             try:
                 settings = {
+                    "settings": {
+                        "analysis": {
+                            "analyzer": {
+                                "ngram_analyzer": {
+                                    "tokenizer": "ngram_tokenizer"
+                                }
+                            },
+                            "tokenizer": {
+                                "ngram_tokenizer": {
+                                    "type": "ngram",
+                                    "min_gram": 3,
+                                    "max_gram": 3,
+                                    "token_chars": [
+                                        "letter",
+                                        "digit"
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     "mappings": {
                         "properties": {
                             "brand": {
@@ -120,15 +142,12 @@ class AmazonwebscraperPipeline(object):
                             "screen_size": {
                                 "type": "double",
                             },
-                            # "description": {
-                            #     "type": "text",
-                            #     "index": "false"
-                            # },
                             "wireless_net_tech": {
                                 "type": "text",
                             },
                             "full": {
                                 "type": "text",
+                                "analyzer": "ngram_analyzer"
                             }
                         }
                     }
@@ -143,8 +162,6 @@ class AmazonwebscraperPipeline(object):
             print("Couldn't connect to Elasticsearch. Error " + str(err))
 
     def process_item(self, item, spider):
-        # TODO: Get items properties and create indexes in Elasticsearch
-        # Añadir al indice riws amazon scraper cada item como documento   
         try:
             es = Elasticsearch(ELASTICSEARCH_URL, http_auth=(ELASTICSEARCH_USER, ELASTICSEARCH_PASSWORD),
                                verify_certs=False)
