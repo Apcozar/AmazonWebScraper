@@ -83,26 +83,6 @@ class AmazonwebscraperPipeline(object):
             # Create index in Elasticsearch
             try:
                 settings = {
-                    "settings": {
-                        "analysis": {
-                            "analyzer": {
-                                "ngram_analyzer": {
-                                    "tokenizer": "ngram_tokenizer"
-                                }
-                            },
-                            "tokenizer": {
-                                "ngram_tokenizer": {
-                                    "type": "ngram",
-                                    "min_gram": 3,
-                                    "max_gram": 3,
-                                    "token_chars": [
-                                        "letter",
-                                        "digit"
-                                    ]
-                                }
-                            }
-                        }
-                    },
                     "mappings": {
                         "properties": {
                             "brand": {
@@ -147,7 +127,6 @@ class AmazonwebscraperPipeline(object):
                             },
                             "full": {
                                 "type": "text",
-                                "analyzer": "ngram_analyzer"
                             }
                         }
                     }
@@ -186,7 +165,8 @@ class AmazonwebscraperPipeline(object):
                     item['screen_size']) + " " + str(item['wireless_net_tech'])
             }
 
-            es.index(index="riws_amazon_scraper", document=doc)
+            if item['brand'] and item['os'] and item['cellular_technology'] and item['memory_storage']:
+                es.index(index="riws_amazon_scraper", document=doc)
         except Exception as err:
             print("Couldn't connect to Elasticsearch in indexing item " + str(item) + ". Error " + str(err))
 

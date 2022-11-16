@@ -9,10 +9,9 @@ class AmazonSpider(scrapy.Spider):
     name = 'amazon'
     base_url = 'https://www.amazon.es'
     page_number = 0
-    max_pages = 30
+    max_pages = 20
     start_urls = [
-        'https://www.amazon.es/s?bbn=599370031&rh=n%3A17425698031&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433'
-        '&pd_rd_w=tsGEf&pd_rd_wg=GvZaY&rd=1&ref=Oct_d_odnav_599370031']
+        'https://www.amazon.es/s?i=electronics&bbn=599370031&rh=n%3A17425698031&page=4&brr=1&pd_rd_r=f7665802-112d-4aa6-a067-6f86311b8433%27%27&pd_rd_w=tsGEf&pd_rd_wg=GvZaY&qid=1668634648&rd=1&ref=sr_pg_4']
 
     def parse(self, response):
         AmazonSpider.page_number += 1
